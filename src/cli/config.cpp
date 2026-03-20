@@ -1,5 +1,4 @@
-#include "kv3d/api/server.hpp"
-#include "kv3d/sched/session_manager.hpp"
+#include "kv3d/cli/config.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -14,13 +13,6 @@ namespace kv3d {
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
-struct EngineConfig {
-    api::ServerConfig server;
-    SessionManagerConfig session;
-    std::string model_path;
-    std::string model_id{"default"};
-};
-
 static fs::path default_config_path() {
     const char* xdg = std::getenv("XDG_CONFIG_HOME");
     fs::path base = xdg ? fs::path(xdg) : (fs::path(std::getenv("HOME")) / ".config");
@@ -28,7 +20,7 @@ static fs::path default_config_path() {
 }
 
 /// Load config from a JSON file. Returns defaults if the file does not exist.
-EngineConfig load_config(std::optional<std::string> path_override = std::nullopt) {
+EngineConfig load_config(std::optional<std::string> path_override) {
     fs::path cfg_path = path_override ? fs::path(*path_override) : default_config_path();
 
     EngineConfig cfg;

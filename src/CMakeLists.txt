@@ -54,7 +54,6 @@ add_library(kv3d_api STATIC
 )
 target_include_directories(kv3d_api PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(kv3d_api PUBLIC kv3d_sched httplib::httplib nlohmann_json::nlohmann_json)
-target_compile_definitions(kv3d_api PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT=0)
 kv3d_set_warnings(kv3d_api)
 
 # ── kv3d_cli (binary) ──────────────────────────────────────────────────────────

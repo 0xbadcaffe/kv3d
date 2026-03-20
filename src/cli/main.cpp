@@ -1,5 +1,4 @@
-#include "kv3d/api/server.hpp"
-#include "kv3d/sched/session_manager.hpp"
+#include "kv3d/cli/config.hpp"
 
 #include <cstdlib>
 #include <filesystem>
@@ -10,13 +9,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-
-// Forward declarations from config.cpp
-namespace kv3d {
-struct EngineConfig;
-EngineConfig load_config(std::optional<std::string> path_override);
-void write_default_config(const std::filesystem::path& path);
-}  // namespace kv3d
 
 namespace {
 

@@ -106,7 +106,7 @@ void register_routes(httplib::Server& srv, std::shared_ptr<SessionManager> sessi
                              first.created = created;
                              first.model = cr.model;
                              first.choices = {StreamChoice{0, DeltaContent{"assistant", ""}, {}}};
-                             sink.write(chunk_to_sse(first));
+                             { const std::string s = chunk_to_sse(first); sink.write(s.data(), s.size()); }
 
                              // Stream tokens
                              bool ok = true;
@@ -119,10 +119,10 @@ void register_routes(httplib::Server& srv, std::shared_ptr<SessionManager> sessi
                                  sc.delta.content = std::string(token);
                                  if (done) sc.finish_reason = "stop";
                                  chunk.choices = {sc};
-                                 ok = sink.write(chunk_to_sse(chunk));
+                                 { const std::string s = chunk_to_sse(chunk); ok = sink.write(s.data(), s.size()); }
                              });
 
-                             sink.write(sse_done_sentinel());
+                             { const std::string s = sse_done_sentinel(); sink.write(s.data(), s.size()); }
                              sink.done();
                              return true;
                          });
