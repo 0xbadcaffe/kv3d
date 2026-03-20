@@ -75,7 +75,8 @@ cd kv3d
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)
 
-./build/kv3d serve --model ./models/qwen.gguf
+build/src/kv3d doctor
+build/src/kv3d serve --model ./models/qwen.gguf
 ```
 
 ---
@@ -83,6 +84,15 @@ cmake --build build -j$(nproc)
 ## API
 
 Drop-in replacement for the OpenAI chat completions endpoint.
+
+**Health check**
+
+```bash
+curl http://localhost:8080/health
+# {"status":"ok","service":"kv3d-engine"}
+```
+
+**Chat completion**
 
 ```bash
 curl http://localhost:8080/v1/chat/completions \
@@ -101,7 +111,30 @@ curl http://localhost:8080/v1/chat/completions \
 ```bash
 curl http://localhost:8080/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"model": "qwen2.5-7b-instruct", "stream": true, "messages": [...]}'
+  -d '{
+    "model": "qwen2.5-7b-instruct",
+    "stream": true,
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user",   "content": "Count to five."}
+    ]
+  }'
+```
+
+**See the prefix cache working** — two requests, same system prompt, different user messages:
+
+```bash
+# First request → cache MISS (computes and stores prefix snapshot)
+curl -s http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" \
+  -d '{"model":"m","messages":[{"role":"system","content":"You are a coding assistant."},{"role":"user","content":"Write a sort function."}]}'
+
+# Second request → cache HIT (reuses the prefix snapshot)
+curl -s http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" \
+  -d '{"model":"m","messages":[{"role":"system","content":"You are a coding assistant."},{"role":"user","content":"Write a binary search."}]}'
+
+# Confirm: hit_rate should be 0.5
+curl -s http://localhost:8080/metrics | grep hit_rate
+# kv3d_prefix_hit_rate 0.5
 ```
 
 **Metrics** (Prometheus)
@@ -195,16 +228,19 @@ REQUESTS=1000 SHARED_RATIO=0.8 ./scripts/bench.sh
 ```bash
 # Debug build with sanitizers
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DKV3D_ENABLE_SANITIZERS=ON
-cmake --build build -j
+cmake --build build -j$(nproc)
 
-# Run tests
+# Run all tests
 ctest --test-dir build --output-on-failure
 
 # Run unit tests only
-./build/tests/unit/kv3d_unit_tests
+build/tests/unit/kv3d_unit_tests
 
-# Run integration tests
-./build/tests/integration/kv3d_integration_tests
+# Run integration tests only
+build/tests/integration/kv3d_integration_tests
+
+# Run benchmark (1000 requests, 80% sharing a system prompt)
+build/tests/load/kv3d_bench --requests 1000 --shared-ratio 0.8
 ```
 
 ### Repository layout
