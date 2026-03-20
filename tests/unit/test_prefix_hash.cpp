@@ -68,18 +68,35 @@ TEST_CASE("prefix_message_count: system only -> 1", "[canonical]") {
     REQUIRE(prefix_message_count(msgs, opts) == 1);
 }
 
-TEST_CASE("prefix_message_count: system + first user -> 2", "[canonical]") {
+TEST_CASE("prefix_message_count: system + first user -> 2 (explicit opt-in)", "[canonical]") {
     std::vector<ChatMessage> msgs = {{"system", "You are helpful."},
                                      {"user", "What is 2+2?"},
                                      {"assistant", "4"},
                                      {"user", "Thanks"}};
-    REQUIRE(prefix_message_count(msgs) == 2);
+    PrefixExtractionOptions opts;
+    opts.system_only = false;
+    REQUIRE(prefix_message_count(msgs, opts) == 2);
 }
 
-TEST_CASE("extract_canonical_prefix: consistent format", "[canonical]") {
+TEST_CASE("prefix_message_count: default is system_only", "[canonical]") {
+    std::vector<ChatMessage> msgs = {{"system", "You are helpful."},
+                                     {"user", "What is 2+2?"}};
+    REQUIRE(prefix_message_count(msgs) == 1);
+}
+
+TEST_CASE("extract_canonical_prefix: consistent format (system only)", "[canonical]") {
     std::vector<ChatMessage> msgs = {{"system", "  You are helpful.  "},
                                      {"user", "Hello"}};
     const std::string canon = extract_canonical_prefix(msgs);
+    REQUIRE(canon == "<system>You are helpful.</system>");
+}
+
+TEST_CASE("extract_canonical_prefix: includes user turn when opted in", "[canonical]") {
+    std::vector<ChatMessage> msgs = {{"system", "  You are helpful.  "},
+                                     {"user", "Hello"}};
+    PrefixExtractionOptions opts;
+    opts.system_only = false;
+    const std::string canon = extract_canonical_prefix(msgs, opts);
     REQUIRE(canon == "<system>You are helpful.</system><user>Hello</user>");
 }
 

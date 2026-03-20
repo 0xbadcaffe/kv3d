@@ -16,7 +16,8 @@ struct ChatMessage {
 struct PrefixExtractionOptions {
     /// Include only the system message (role == "system") in the prefix.
     /// When false, also include the first user turn.
-    bool system_only = false;
+    /// Default true: the system prompt is the natural shared prefix across sessions.
+    bool system_only = true;
     /// Normalize whitespace (collapse runs, strip edges) before hashing.
     bool normalize_whitespace = true;
 };
