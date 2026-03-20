@@ -1,0 +1,10 @@
+add_executable(kv3d_integration_tests
+    test_api_session_resume.cpp
+)
+target_link_libraries(kv3d_integration_tests
+    PRIVATE
+        kv3d_api
+        kv3d_sched
+        Catch2::Catch2WithMain
+)
+catch_discover_tests(kv3d_integration_tests)

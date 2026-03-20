@@ -1,0 +1,34 @@
+build/
+.cache/
+*.o
+*.a
+*.so
+*.dylib
+compile_commands.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Models
+models/
+*.gguf
+*.ggml
+*.bin
+
+# Logs and benchmarks
+*.log
+bench_results/
+*.csv
+
+# macOS
+.DS_Store
+
+# Distribution
+dist/
+*.tar.gz
+*.deb
+*.rpm

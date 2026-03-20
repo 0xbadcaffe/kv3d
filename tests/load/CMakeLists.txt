@@ -1,0 +1,9 @@
+add_executable(kv3d_bench
+    bench_driver.cpp
+)
+target_link_libraries(kv3d_bench
+    PRIVATE
+        kv3d_api
+        kv3d_sched
+        kv3d_metrics
+)

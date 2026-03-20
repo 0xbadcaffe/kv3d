@@ -1,0 +1,11 @@
+add_executable(kv3d_unit_tests
+    test_prefix_hash.cpp
+    test_delta_codec.cpp
+)
+target_link_libraries(kv3d_unit_tests
+    PRIVATE
+        kv3d_core
+        kv3d_kv
+        Catch2::Catch2WithMain
+)
+catch_discover_tests(kv3d_unit_tests)
