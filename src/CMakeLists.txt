@@ -19,6 +19,14 @@ target_include_directories(kv3d_kv PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(kv3d_kv PUBLIC kv3d_core)
 kv3d_set_warnings(kv3d_kv)
 
+# ── kv3d_kv_experimental (Phase 2: collaborative block codec) ─────────────────
+add_library(kv3d_kv_experimental STATIC
+    kv/experimental/group_codec.cpp
+)
+target_include_directories(kv3d_kv_experimental PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(kv3d_kv_experimental PUBLIC kv3d_kv)
+kv3d_set_warnings(kv3d_kv_experimental)
+
 # ── kv3d_storage ───────────────────────────────────────────────────────────────
 add_library(kv3d_storage STATIC
     storage/gpu_cache.cpp
